@@ -16,7 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@Component
+// @Component
 public class AuthenticationFilter extends OncePerRequestFilter{
 	
 	private MemberTokenRepo memberTokenRepo;
@@ -33,6 +33,12 @@ public class AuthenticationFilter extends OncePerRequestFilter{
                                     FilterChain filterChain) throws ServletException, IOException {
     	
     	String path = request.getServletPath();
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
     	 if (path.startsWith("/login") ||
     			 path.startsWith("/member/register") ||
     			 path.startsWith("/books/get-books") ||
