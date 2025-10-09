@@ -43,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void generateBorrowAcknowledgements() {
-    	entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 0").executeUpdate();
+//    	entityManager.createNativeQuery("SET SQL_SAFE_UPDATES = 0").executeUpdate();
     	
         int created = notificationRepository.insertBorrowAcknowledgements();
         System.out.println("Created Borrow notifications: " + created);

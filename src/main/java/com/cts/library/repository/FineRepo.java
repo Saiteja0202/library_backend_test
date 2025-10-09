@@ -14,7 +14,7 @@ public interface FineRepo extends JpaRepository<Fine, Long> {
     @Query(value = """
         INSERT INTO fine (amount, fine_status, member_id, transaction_id, transaction_date)
         SELECT 
-            DATEDIFF(CURRENT_DATE, bt.return_date) * 20.0 AS amount,
+            (CURRENT_DATE - bt.return_date) * 20.0 AS amount,
             'PENDING' AS fine_status,
             bt.member_id,
             bt.transaction_id,
@@ -33,13 +33,14 @@ public interface FineRepo extends JpaRepository<Fine, Long> {
     @Modifying
     @Transactional
     @Query(value = """
-        UPDATE fine f
-        JOIN borrowing_transaction bt ON f.transaction_id = bt.transaction_id
-        SET f.amount = f.amount + 20,
-            f.transaction_date = CURRENT_DATE
-        WHERE f.fine_status = 'PENDING'
+        UPDATE fine
+        SET amount = fine.amount + 20,
+            transaction_date = CURRENT_DATE
+        FROM borrowing_transaction bt
+        WHERE fine.transaction_id = bt.transaction_id
+          AND fine.fine_status = 'PENDING'
           AND bt.status = 'BORROWED'
-          AND CURRENT_DATE != f.transaction_date
+          AND CURRENT_DATE != fine.transaction_date
         """, nativeQuery = true)
     int updatePendingFineAmountsDaily();
 
